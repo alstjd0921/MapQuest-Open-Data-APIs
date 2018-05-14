@@ -6,6 +6,7 @@ ROUTE_URL = 'http://open.mapquestapi.com/directions/v2/route'
 ELEVATION_URL = 'http://open.mapquestapi.com/elevation/v1/profile'
 
 
+# STEPS, TOTALDISTANCE, TOTALTIME, LATLONG, ELEVATION 의 각 출력을 위한 객체
 class STEPS:
     def __init__(self, directions: [str]):
         self._directions = directions
@@ -59,6 +60,7 @@ class ELEVATION:
         print()
 
 
+# 흐름 제어
 def navigation():
     try:
         locations = get_locations()
@@ -84,16 +86,17 @@ def navigation():
         for data in trip_info:
             data.output()
 
-    except urllib.error.HTTPError:
+    except urllib.error.HTTPError:  # 길을 찾지 못했다면
         print("NO ROUTE FOUND")
 
-    except:
+    except:  # 그 외의 에러
         print("MAPQUEST ERROR")
 
-    else:
+    else:  # 정상적인 출력을 마친 후
         print('Directions Courtesy of MapQuest; Map Data Copyright OpenStreetMap Contributors.')
 
 
+# 위치 입력
 def get_locations():
     num_of_locations = int(input())
     locations = []
@@ -104,6 +107,7 @@ def get_locations():
     return locations
 
 
+# 출력해야할 정보 입력
 def get_outputs():
     num_of_outputs = int(input())
     outputs = []
@@ -114,6 +118,7 @@ def get_outputs():
     return outputs
 
 
+# 출력 객체를 생성하는 함수
 def create_outputs(output_types: [], mapquest_data: dict, elevation_data: [dict]):
     output_objects = []
     for type in output_types:
@@ -159,6 +164,7 @@ def create_outputs(output_types: [], mapquest_data: dict, elevation_data: [dict]
     return output_objects
 
 
+# coords를 만드는 함수
 def get_coords(mapquest_data: dict):
     locations = mapquest_data['route']['locations']
     lats = []
@@ -173,6 +179,7 @@ def get_coords(mapquest_data: dict):
     return lat_longs
 
 
+# coords에 방향을 추가하는 함수
 def add_direction(coords: [], type: str):
     if type == 'lat':
         for i in range(len(coords)):
@@ -191,6 +198,7 @@ def add_direction(coords: [], type: str):
     return coords
 
 
+# lats와 longs를 합치는 함수
 def merge_lats_and_longs(lats: [], longs: []):
     latlongs = []
     for i in range(len(lats)):
@@ -200,6 +208,7 @@ def merge_lats_and_longs(lats: [], longs: []):
     return latlongs
 
 
+# 요청을 위한 url을 만드는 함수
 def make_route_url(locations: []):
     url_parameters = [('key', MY_API_KEY), ('from', locations[0])]
     for i in range(1, len(locations)):
@@ -209,12 +218,14 @@ def make_route_url(locations: []):
     return ROUTE_URL + '?' + urllib.parse.urlencode(url_parameters)
 
 
+# Elevation 요청을 위한 url을 만드는 함수
 def make_elevation_url(coords: str):
     url_parameters = [('key', MY_API_KEY), ('latLngCollection', coords)]
 
     return ELEVATION_URL + '?' + urllib.parse.urlencode(url_parameters)
 
 
+# 요청을 받아오는 함수
 def get_response(url: str):
     response = None
     try:

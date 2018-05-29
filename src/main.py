@@ -63,14 +63,14 @@ class ELEVATION:
 # 흐름 제어
 def navigation():
     try:
-        locations = get_locations()
-        trip_info = get_outputs()
-        route_url = make_route_url(locations)
+        locations = get_locations()  # 위치정보 입력
+        trip_info = get_outputs()  # 출력해야할 정보 입력
+        route_url = make_route_url(locations)  # 요청을 위한 url 제작
 
-        res = get_response(route_url)
+        res = get_response(route_url)  # 요청을 받아옴
 
-        coords = get_coords(res)
-        coords = merge_lats_and_longs(coords['lats'], coords['longs'])
+        coords = get_coords(res)  # 받아온 json에서 lat과 long을 분리함
+        coords = merge_lats_and_longs(coords['lats'], coords['longs'])  # lat과 long은 동시에 다루므로 합쳐놓음
 
         elevation_urls = []
         for i in range(0, len(coords), 2):
@@ -81,9 +81,9 @@ def navigation():
         for url in elevation_urls:
             elevation_data.append(get_response(url))
 
-        trip_info = create_outputs(trip_info, res, elevation_data)
-        print()
-        for data in trip_info:
+        trip_info = create_outputs(trip_info, res, elevation_data)  # 받아온 json에서 출력을 위해 각 출력객체로 분리함
+        print()  # 결과 출력 전 개행
+        for data in trip_info:  # 결과 출력
             data.output()
 
     except urllib.error.HTTPError:  # 길을 찾지 못했다면
